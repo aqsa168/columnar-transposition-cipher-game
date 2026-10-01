@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Columnar Transposition Cipher – Encrypt & Decrypt Challenge</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+</head>
+<body>
+
+  <!-- App Header & Student Stats -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-title">
+        <span class="brand-icon">🎓</span>
+        <div class="brand-text">
+          <h1>Columnar Transposition Cipher</h1>
+          <p>Interactive Encrypt & Decrypt Challenge for Cryptography Learners</p>
+        </div>
+      </div>
+
+      <!-- Student Score HUD -->
+      <div class="stats-hud">
+        <div class="hud-chip" title="Current Score Points">
+          <span class="chip-label">Score:</span>
+          <span class="chip-score" id="hudScore">0</span>
+        </div>
+        <div class="hud-chip" title="Correct Step Completions">
+          <span class="chip-label">Correct:</span>
+          <span class="chip-correct" id="hudCorrect">0</span>
+        </div>
+        <div class="hud-chip" title="Incorrect Step Attempts">
+          <span class="chip-label">Mistakes:</span>
+          <span class="chip-incorrect" id="hudIncorrect">0</span>
+        </div>
+        <button class="btn-secondary" id="audioToggleBtn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+          🔊 Sound: On
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Bar with Tabs & Difficulty -->
+  <nav class="app-nav">
+    <div class="nav-container">
+      <div class="tab-group">
+        <button class="nav-tab-btn active" data-mode="learn">
+          <span>📚</span> Learn First
+        </button>
+        <button class="nav-tab-btn" data-mode="encrypt">
+          <span>🔒</span> Encrypt Challenge
+        </button>
+        <button class="nav-tab-btn" data-mode="decrypt">
+          <span>🔓</span> Decrypt Challenge
+        </button>
+        <button class="nav-tab-btn" data-mode="custom">
+          <span>⚙️</span> Custom Challenge
+        </button>
+      </div>
+
+      <div class="difficulty-group">
+        <label for="difficultySelect">Level:</label>
+        <select id="difficultySelect" class="diff-select">
+          <option value="easy">Easy (3–4 Key, Even Grid)</option>
+          <option value="medium" selected>Medium (5–6 Key, Padding)</option>
+          <option value="hard">Hard (7–8 Key, Duplicate Letters)</option>
+        </select>
+        <a href="tests.html" class="nav-tab-btn" style="text-decoration: none; padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+          <span>🧪</span> Unit Tests
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Challenge Area -->
+  <main class="challenge-container">
+    <!-- Active Challenge Banner -->
+    <div class="challenge-banner">
+      <div class="challenge-info">
+        <h2>Current Challenge</h2>
+        <div class="challenge-details">
+          <span>Your Message: <strong id="bannerMessage">MEETMEATNOON</strong></span>
+          <span>Your Key: <strong id="bannerKey">ZEBRA</strong></span>
+          <span id="bannerCols">5 Columns</span>
+        </div>
+      </div>
+      <div class="challenge-actions">
+        <button class="btn-secondary" id="newChallengeBtn" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.4);">
+          🎲 New Challenge
+        </button>
+        <button class="btn-secondary" id="hintBtn" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.4);">
+          💡 Hint (-5 pts)
+        </button>
+        <button class="btn-secondary" id="workedExampleBtn" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.4);">
+          📖 Show Worked Example
+        </button>
+      </div>
+    </div>
+
+    <!-- Teacher Feedback & Explanation Box -->
+    <div id="teacherFeedbackBox" class="feedback-box hidden"></div>
+
+    <!-- Dynamic Step Interactive Card -->
+    <div id="mainChallengeArea"></div>
+  </main>
+
+  <!-- Worked Example Modal -->
+  <div class="modal-overlay" id="workedExampleModal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+        <h3 style="color: var(--primary); font-size: 1.2rem; font-weight: 800;">📖 Complete Worked Example</h3>
+        <button class="btn-secondary" id="closeWorkedExampleBtn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">✕ Close</button>
+      </div>
+      <div id="workedExampleContentArea"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="cipher.js"></script>
+  <script src="game.js"></script>
+  <script src="ui.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.app = new UI.UIController();
+    });
+  </script>
+</body>
+</html>

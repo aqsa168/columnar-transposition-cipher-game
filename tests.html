@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Columnar Transposition Challenge - Test Suite</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --pass: #10b981;
+      --fail: #ef4444;
+      --primary: #4f46e5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+      line-height: 1.5;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    h1 { font-size: 1.5rem; color: var(--primary); font-weight: 800; }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .badge-pass { background: rgba(16, 185, 129, 0.15); color: #047857; border: 1px solid var(--pass); }
+    .badge-fail { background: rgba(239, 68, 68, 0.15); color: #b91c1c; border: 1px solid var(--fail); }
+    .summary-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      flex-wrap: wrap;
+    }
+    .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+    .stat-val { font-size: 1.6rem; font-weight: 800; margin-top: 0.25rem; }
+    .test-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+    .section-header {
+      padding: 0.85rem 1.25rem;
+      background: #f1f5f9;
+      font-weight: 800;
+      border-bottom: 1px solid var(--border);
+      color: var(--primary);
+    }
+    .test-item {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid #f8fafc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+    .test-item:last-child { border-bottom: none; }
+    .test-name { display: flex; align-items: center; gap: 0.75rem; }
+    .btn-run {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1.1rem;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    a { color: var(--primary); text-decoration: none; font-weight: 700; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Columnar Transposition Challenge - Test Suite</h1>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.25rem;">
+          Automated verification of key ranking, row calculations, padding, encryption, and decryption.
+        </p>
+      </div>
+      <div>
+        <a href="index.html" style="margin-right: 1.25rem;">← Back to Challenge</a>
+        <button class="btn-run" onclick="runAllTests()">Re-Run Tests</button>
+      </div>
+    </header>
+
+    <div class="summary-card">
+      <div>
+        <div class="stat-label">Total Tests</div>
+        <div class="stat-val" id="totalCount">0</div>
+      </div>
+      <div>
+        <div class="stat-label">Passed</div>
+        <div class="stat-val" style="color: var(--pass);" id="passCount">0</div>
+      </div>
+      <div>
+        <div class="stat-label">Failed</div>
+        <div class="stat-val" style="color: var(--fail);" id="failCount">0</div>
+      </div>
+      <div>
+        <div class="stat-label">Status</div>
+        <div class="stat-val" id="statusBadge"><span class="badge badge-pass">INITIALIZING</span></div>
+      </div>
+    </div>
+
+    <div id="testResults"></div>
+  </div>
+
+  <script src="cipher.js"></script>
+  <script>
+    const resultsContainer = document.getElementById('testResults');
+    let totalTests = 0;
+    let passedTests = 0;
+    let failedTests = 0;
+    let currentSectionEl = null;
+
+    function startSection(title) {
+      const section = document.createElement('div');
+      section.className = 'test-section';
+      const header = document.createElement('div');
+      header.className = 'section-header';
+      header.textContent = title;
+      section.appendChild(header);
+      resultsContainer.appendChild(section);
+      currentSectionEl = section;
+    }
+
+    function recordTest(name, passed, detail = '') {
+      totalTests++;
+      if (passed) passedTests++;
+      else failedTests++;
+
+      const item = document.createElement('div');
+      item.className = 'test-item';
+      item.innerHTML = `
+        <div class="test-name">
+          <span style="color: ${passed ? 'var(--pass)' : 'var(--fail)'}; font-weight: 900;">${passed ? '✔' : '✘'}</span>
+          <div>
+            <div>${name}</div>
+            ${detail ? `<div style="font-size: 0.8rem; color: var(--text-muted);">${detail}</div>` : ''}
+          </div>
+        </div>
+        <span class="badge ${passed ? 'badge-pass' : 'badge-fail'}">${passed ? 'PASS' : 'FAIL'}</span>
+      `;
+      currentSectionEl.appendChild(item);
+      updateSummary();
+    }
+
+    function updateSummary() {
+      document.getElementById('totalCount').textContent = totalTests;
+      document.getElementById('passCount').textContent = passedTests;
+      document.getElementById('failCount').textContent = failedTests;
+      const badge = document.getElementById('statusBadge');
+      if (failedTests === 0) {
+        badge.innerHTML = `<span class="badge badge-pass">ALL TESTS PASSED</span>`;
+      } else {
+        badge.innerHTML = `<span class="badge badge-fail">${failedTests} FAILED</span>`;
+      }
+    }
+
+    function runAllTests() {
+      resultsContainer.innerHTML = '';
+      totalTests = 0;
+      passedTests = 0;
+      failedTests = 0;
+
+      // 1. User Prompt Example 1: MEETMEATNOON + ZEBRA
+      startSection('1. Prompt Example: MEETMEATNOON with Key ZEBRA');
+      const rZebra = Cipher.getKeyRanks('ZEBRA');
+      recordTest(
+        'Key ZEBRA ranks: Z=5, E=3, B=2, R=4, A=1',
+        JSON.stringify(rZebra) === JSON.stringify([5, 3, 2, 4, 1]),
+        `Got: ${JSON.stringify(rZebra)}`
+      );
+
+      const encUnpad = Cipher.encryptColumnar('MEETMEATNOON', 'ZEBRA', false);
+      const decUnpad = Cipher.decryptColumnar(encUnpad.ciphertext, 'ZEBRA', false);
+      recordTest(
+        'MEETMEATNOON unpadded round-trip',
+        decUnpad.plaintext === 'MEETMEATNOON',
+        `Ciphertext: ${encUnpad.ciphertext} -> Restored: ${decUnpad.plaintext}`
+      );
+
+      const encPad = Cipher.encryptColumnar('MEETMEATNOON', 'ZEBRA', true, 'X');
+      const decPad = Cipher.decryptColumnar(encPad.ciphertext, 'ZEBRA', true);
+      recordTest(
+        'MEETMEATNOON padded with X round-trip',
+        decPad.plaintext === 'MEETMEATNOONXXX',
+        `Ciphertext: ${encPad.ciphertext} -> Restored: ${decPad.plaintext}`
+      );
+
+      // 2. User Prompt Canonical Example: WEAREDISCOVERED + ZEBRAS
+      startSection('2. Canonical Example: WEAREDISCOVERED with Key ZEBRAS');
+      const encWeAre = Cipher.encryptColumnar('WEAREDISCOVERED', 'ZEBRAS', false);
+      recordTest(
+        'WEAREDISCOVERED + ZEBRAS produces exact EVACDESERODEWIR',
+        encWeAre.ciphertext === 'EVACDESERODEWIR',
+        `Produced: ${encWeAre.ciphertext}`
+      );
+
+      const decWeAre = Cipher.decryptColumnar('EVACDESERODEWIR', 'ZEBRAS', false);
+      recordTest(
+        'Decrypting EVACDESERODEWIR restores WEAREDISCOVERED',
+        decWeAre.plaintext === 'WEAREDISCOVERED',
+        `Restored: ${decWeAre.plaintext}`
+      );
+
+      // 3. Repeated Letters with Left-To-Right Tie Breaking
+      startSection('3. Left-To-Right Tie-Breaking on Duplicate Key Letters');
+      const rBanana = Cipher.getKeyRanks('BANANA');
+      recordTest(
+        'BANANA: A1=1, A2=2, A3=3, B=4, N1=5, N2=6',
+        JSON.stringify(rBanana) === JSON.stringify([4, 1, 5, 2, 6, 3]),
+        `Got: ${JSON.stringify(rBanana)}`
+      );
+
+      const rTarget = Cipher.getKeyRanks('TARGET');
+      recordTest(
+        'TARGET: T1=5, A=1, R=4, G=3, E=2, T2=6',
+        JSON.stringify(rTarget) === JSON.stringify([5, 1, 4, 3, 2, 6]),
+        `Got: ${JSON.stringify(rTarget)}`
+      );
+
+      // 4. Difficulty Pools Round-Trips
+      startSection('4. Difficulty Challenge Pools Round-Trip Validation');
+      const pools = [
+        { msg: 'SECRETMEN', key: 'CAT', diff: 'Easy' },
+        { msg: 'HELPMEPLEASE', key: 'STAR', diff: 'Easy' },
+        { msg: 'TREASUREISBURIED', key: 'TIGER', diff: 'Medium' },
+        { msg: 'DEFENDTHEEASTWALL', key: 'BANANA', diff: 'Hard' }
+      ];
+
+      pools.forEach(p => {
+        const e = Cipher.encryptColumnar(p.msg, p.key, false);
+        const d = Cipher.decryptColumnar(e.ciphertext, p.key, false);
+        recordTest(
+          `${p.diff}: "${p.msg}" with key "${p.key}"`,
+          d.plaintext === Cipher.normalizeText(p.msg),
+          `Ciphertext: ${e.ciphertext} -> Restored: ${d.plaintext}`
+        );
+      });
+    }
+
+    runAllTests();
+  </script>
+</body>
+</html>
